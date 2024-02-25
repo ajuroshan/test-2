@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Form Submission</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				margin: 0;
+				padding: 0;
+				background-color: #f0f0f0;
+			}
+
+			h1,
+			h2 {
+				text-align: center;
+			}
+
+			#formSection,
+			#responseSection {
+				width: 80%;
+				margin: 0 auto;
+				background-color: #fff;
+				border-radius: 10px;
+				padding: 20px;
+				margin-bottom: 20px;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			}
+
+			label {
+				font-weight: bold;
+			}
+
+			input[type="text"],
+			input[type="email"],
+			textarea {
+				width: 100%;
+				padding: 10px;
+				margin-bottom: 10px;
+				border: 1px solid #ccc;
+				border-radius: 5px;
+				box-sizing: border-box;
+			}
+
+			input[type="submit"] {
+				background-color: #333;
+				color: #fff;
+				padding: 10px 20px;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				width: 100%;
+				display: block;
+			}
+
+			input[type="submit"]:hover {
+				background-color: #444;
+			}
+
+			#responseContainer p {
+				margin-bottom: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Form Submission</h1>
+		<section id="formSection">
+			<h2>Fill out the form:</h2>
+			<form id="feedbackForm">
+				<label for="name">Name:</label>
+				<input type="text" id="name" name="name" required /><br /><br />
+
+				<label for="email">Email:</label>
+				<input type="email" id="email" name="email" required /><br /><br />
+
+				<label for="feedback">Feedback:</label><br />
+				<textarea id="feedback" name="feedback" rows="4" cols="50" required></textarea><br /><br />
+
+				<input type="submit" value="Submit" />
+			</form>
+		</section>
+
+		<section id="responseSection">
+			<h2>Form Submission Result:</h2>
+			<div id="responseContainer"></div>
+		</section>
+
+		<script>
+			document.getElementById("feedbackForm").addEventListener("submit", function (event) {
+				event.preventDefault(); // Prevent the default form submission
+
+				// Fetch the form data
+				const formData = new FormData(event.target);
+
+				// Make a POST request to your FastAPI endpoint
+				fetch("http://localhost:8000/api/submit_form", {
+					method: "POST",
+					body: formData,
+				})
+					.then((response) => response.json())
+					.then((data) => {
+						// Create HTML content for the response
+						const responseHtml = `
+                    <p>Name: ${data.name}</p>
+                    <p>Email: ${data.email}</p>
+                    <p>Feedback: ${data.feedback}</p>
+                `;
+
+						// Update the HTML content of the response container
+						document.getElementById("responseContainer").innerHTML = responseHtml;
+
+						// Hide the form section and show the response section
+						document.getElementById("formSection").style.display = "none";
+						document.getElementById("responseSection").style.display = "block";
+					})
+					.catch((error) => {
+						console.error("Error:", error);
+					});
+			});
+		</script>
+	</body>
+</html>
